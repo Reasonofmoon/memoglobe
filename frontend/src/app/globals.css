@@ -1,26 +1,225 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ─── Core Theme: Deep Space Learning ─── */
+  --bg-primary: #0a0e1a;
+  --bg-secondary: #111827;
+  --bg-tertiary: #1f2937;
+  --surface-glass: rgba(255, 255, 255, 0.05);
+  --text-primary: #f9fafb;
+  --text-secondary: #9ca3af;
+  --text-accent: #60a5fa;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.15);
+
+  /* ─── Pin Colors (§5.4) ─── */
+  --pin-mastered: #22c55e;
+  --pin-gap: #ef4444;
+  --pin-review: #eab308;
+  --pin-path: #3b82f6;
+  --pin-personal: #a855f7;
+
+  /* ─── Accent Gradients ─── */
+  --gradient-primary: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #a855f7 100%);
+  --gradient-warm: linear-gradient(135deg, #f97316 0%, #ef4444 100%);
+  --gradient-cool: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+
+  /* ─── Spacing ─── */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  overflow: hidden;
+  height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ─── Glass Card ─── */
+.glass-card {
+  background: var(--surface-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  transition: all 0.2s ease;
+}
+.glass-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* ─── Pin Markers ─── */
+.pin-mastered { color: var(--pin-mastered); }
+.pin-gap { color: var(--pin-gap); }
+.pin-review { color: var(--pin-review); }
+.pin-path { color: var(--pin-path); }
+.pin-personal { color: var(--pin-personal); }
+
+/* ─── Pulsing Pin ─── */
+@keyframes pin-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.7; }
+}
+.pin-needs-review {
+  animation: pin-pulse 2s ease-in-out infinite;
+}
+
+/* ─── Gradient Text ─── */
+.gradient-text {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Globe container ─── */
+.globe-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ─── Side Panel ─── */
+.side-panel {
+  position: fixed;
+  right: 0;
+  top: 0;
+  height: 100vh;
+  width: 400px;
+  z-index: 50;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.side-panel.open {
+  transform: translateX(0);
+}
+
+/* ─── Floating Nav ─── */
+.floating-nav {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  gap: 4px;
+  padding: 6px;
+  background: rgba(17, 24, 39, 0.9);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+}
+
+.floating-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  background: transparent;
+}
+.floating-nav-item:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.06);
+}
+.floating-nav-item.active {
+  color: white;
+  background: var(--gradient-primary);
+}
+
+/* ─── Stats Badge ─── */
+.stat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--surface-glass);
+  border: 1px solid var(--border-subtle);
+}
+
+/* ─── Quest Card ─── */
+.quest-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: var(--surface-glass);
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.quest-card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* ─── Code/Mono Text ─── */
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .side-panel {
+    width: 100%;
+    height: 60vh;
+    top: auto;
+    bottom: 0;
+    transform: translateY(100%);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  }
+  .side-panel.open {
+    transform: translateY(0);
+  }
+  .floating-nav {
+    bottom: 12px;
+    gap: 2px;
+    padding: 4px;
+  }
+  .floating-nav-item {
+    padding: 8px 14px;
+    font-size: 12px;
+  }
 }

@@ -1,0 +1,2 @@
+"""MemoGlobe backend application package."""
+
