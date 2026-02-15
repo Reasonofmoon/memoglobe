@@ -1,0 +1,570 @@
+openapi: "3.1.0"
+info:
+  title: MemoGlobe API
+  version: "1.0.0"
+  description: |
+    Geo-Metacognitive Self-Evolution Learning Platform API.
+    Contract between CODEX (Backend) and ANTIGRAVITY (Frontend).
+servers:
+  - url: https://api.memoglobe.app/v1
+    description: Production
+  - url: http://localhost:8000/v1
+    description: Local development
+
+security:
+  - BearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # ─── Core Entities ───────────────────────────────
+    User:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string, format: email }
+        name: { type: string }
+        locale: { type: string, enum: [ko, en, ja, zh] }
+        created_at: { type: string, format: date-time }
+      required: [id, email, name]
+
+    Note:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        user_id: { type: string, format: uuid }
+        template_type: { type: string, enum: [cornell, zettelkasten, outline, concept_map] }
+        subject: { type: string }
+        raw_content: { type: object }
+        extracted_concepts: { type: array, items: { type: string } }
+        session_number: { type: integer }
+        created_at: { type: string, format: date-time }
+      required: [id, user_id, template_type, subject, raw_content]
+
+    NoteCreateRequest:
+      type: object
+      properties:
+        template_type: { type: string, enum: [cornell, zettelkasten, outline, concept_map] }
+        subject: { type: string }
+        content: { type: object, description: "Template-specific structured data" }
+      required: [template_type, subject, content]
+
+    NoteCreateResponse:
+      type: object
+      properties:
+        note_id: { type: string, format: uuid }
+        status: { type: string, enum: [processing] }
+        analysis_eta_seconds: { type: integer }
+
+    AnalysisReport:
+      type: object
+      properties:
+        srs_score: { type: number, minimum: 0, maximum: 1 }
+        kcs_score: { type: number, minimum: 0, maximum: 1 }
+        bloom_distribution:
+          type: object
+          properties:
+            remember: { type: number }
+            understand: { type: number }
+            apply: { type: number }
+            analyze: { type: number }
+            evaluate: { type: number }
+            create: { type: number }
+        cli_score: { type: number, minimum: 0, maximum: 1 }
+        dag_violations: { type: array, items: { type: string } }
+        uncovered_concepts: { type: array, items: { type: string } }
+        redundant_with: { type: array, items: { type: string, format: uuid } }
+        feedback_cards: { type: array, items: { $ref: "#/components/schemas/FeedbackCard" } }
+
+    FeedbackCard:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [gap_alert, redundancy_warning, bloom_imbalance, cognitive_overload, growth_ready]
+        severity: { type: string, enum: [info, warning, critical] }
+        message: { type: string }
+        action: { type: object }
+
+    Concept:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        aliases: { type: array, items: { type: string } }
+        domain: { type: string }
+        bloom_level:
+          type: string
+          enum: [remember, understand, apply, analyze, evaluate, create]
+
+    Location:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        description: { type: string }
+        latitude: { type: number }
+        longitude: { type: number }
+        country: { type: string }
+        type:
+          type: string
+          enum: [library, laboratory, observatory, museum, university, landmark, personal]
+        image_url: { type: string }
+        street_view_available: { type: boolean }
+        metadata: { type: object }
+
+    GeoAnchor:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        user_id: { type: string, format: uuid }
+        concept_id: { type: string, format: uuid }
+        location_id: { type: string, format: uuid }
+        anchor_strategy: { type: string, enum: [historical, cultural, personal] }
+        strength: { type: number, minimum: 0, maximum: 1 }
+        created_at: { type: string, format: date-time }
+        last_reviewed_at: { type: string, format: date-time }
+        review_count: { type: integer }
+
+    GeoAnchorWithLocation:
+      allOf:
+        - $ref: "#/components/schemas/GeoAnchor"
+        - type: object
+          properties:
+            concept: { $ref: "#/components/schemas/Concept" }
+            location: { $ref: "#/components/schemas/Location" }
+            pin_color:
+              type: string
+              enum: [mastered, gap, review, path]
+
+    GeoAnchorCreateRequest:
+      type: object
+      properties:
+        concept_id: { type: string, format: uuid }
+        location:
+          type: object
+          properties:
+            latitude: { type: number }
+            longitude: { type: number }
+            name: { type: string }
+          required: [latitude, longitude, name]
+        anchor_strategy: { type: string, enum: [personal] }
+      required: [concept_id, location, anchor_strategy]
+
+    ReviewRequest:
+      type: object
+      properties:
+        recall_quality: { type: integer, minimum: 1, maximum: 5 }
+      required: [recall_quality]
+
+    ReviewResponse:
+      type: object
+      properties:
+        updated_strength: { type: number }
+        next_review_at: { type: string, format: date-time }
+
+    JourneyRoute:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        stops: { type: array, items: { $ref: "#/components/schemas/GeoAnchorWithLocation" } }
+        estimated_time_minutes: { type: integer }
+        progress:
+          type: object
+          properties:
+            completed: { type: integer }
+            total: { type: integer }
+
+    DailyQuest:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        date: { type: string, format: date }
+        quests:
+          type: array
+          items:
+            type: object
+            properties:
+              type: { type: string, enum: [gap_review, bloom_push, new_explore] }
+              concept_id: { type: string, format: uuid }
+              location_id: { type: string, format: uuid }
+              bloom_target: { type: string }
+        journey_route: { $ref: "#/components/schemas/JourneyRoute" }
+        completed: { type: boolean }
+
+    MetacogDashboard:
+      type: object
+      properties:
+        bloom_distribution:
+          type: object
+          properties:
+            remember: { type: number }
+            understand: { type: number }
+            apply: { type: number }
+            analyze: { type: number }
+            evaluate: { type: number }
+            create: { type: number }
+        kcs_by_subject:
+          type: array
+          items:
+            type: object
+            properties:
+              subject: { type: string }
+              coverage_pct: { type: number }
+              gap_count: { type: integer }
+        cli_trend:
+          type: array
+          items:
+            type: object
+            properties:
+              week: { type: string }
+              avg_cli: { type: number }
+        evolution_index: { type: number }
+        streak: { type: integer }
+
+    KnowledgeMapRegion:
+      type: object
+      properties:
+        latitude: { type: number }
+        longitude: { type: number }
+        radius: { type: number }
+        coverage_pct: { type: number }
+        concept_count: { type: integer }
+
+    ScaffoldingRequest:
+      type: object
+      properties:
+        concept_id: { type: string, format: uuid }
+        trigger_reason: { type: string, enum: [cli_overload, zpd_not_ready, student_request] }
+      required: [concept_id, trigger_reason]
+
+    ScaffoldingResponse:
+      type: object
+      properties:
+        level: { type: string, enum: [hint, decompose, simplify] }
+        content: { type: object }
+
+    # ─── Template-Specific Schemas ────────────────────
+    CornellContent:
+      type: object
+      properties:
+        cue_column: { type: array, items: { type: string } }
+        main_notes: { type: string }
+        summary: { type: string }
+
+    ZettelkastenContent:
+      type: object
+      properties:
+        atomic_note: { type: string }
+        links: { type: array, items: { type: string, format: uuid } }
+        tags: { type: array, items: { type: string } }
+        source: { type: string }
+
+    OutlineContent:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              level: { type: integer }
+              text: { type: string }
+              children: { type: array, items: { type: object } }
+
+    ConceptMapContent:
+      type: object
+      properties:
+        nodes:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              label: { type: string }
+        edges:
+          type: array
+          items:
+            type: object
+            properties:
+              from: { type: string }
+              to: { type: string }
+              relationship: { type: string }
+
+paths:
+  # ─── NOTES ─────────────────────────────────────────
+  /notes:
+    post:
+      operationId: createNote
+      summary: Submit a new note for analysis
+      tags: [Notes]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/NoteCreateRequest" }
+      responses:
+        "202":
+          description: Note accepted for processing
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/NoteCreateResponse" }
+    get:
+      operationId: listNotes
+      summary: List user's notes
+      tags: [Notes]
+      parameters:
+        - { name: subject, in: query, schema: { type: string } }
+        - { name: page, in: query, schema: { type: integer, default: 1 } }
+        - { name: limit, in: query, schema: { type: integer, default: 20 } }
+      responses:
+        "200":
+          description: Paginated list of notes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  notes: { type: array, items: { $ref: "#/components/schemas/Note" } }
+                  total: { type: integer }
+                  page: { type: integer }
+
+  /notes/{noteId}:
+    get:
+      operationId: getNote
+      summary: Get a single note with optional analysis
+      tags: [Notes]
+      parameters:
+        - { name: noteId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: Note with analysis
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  note: { $ref: "#/components/schemas/Note" }
+                  analysis: { $ref: "#/components/schemas/AnalysisReport" }
+
+  # ─── ANALYSIS ──────────────────────────────────────
+  /notes/{noteId}/analysis:
+    get:
+      operationId: getNoteAnalysis
+      summary: Get AI analysis for a note
+      tags: [Analysis]
+      parameters:
+        - { name: noteId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: Full analysis report
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AnalysisReport" }
+
+  # ─── GLOBE & GEOANCHORS ────────────────────────────
+  /globe/anchors:
+    get:
+      operationId: listGeoAnchors
+      summary: All user's geo-anchors for globe rendering
+      tags: [Globe]
+      parameters:
+        - { name: subject, in: query, schema: { type: string } }
+        - { name: bloom_level, in: query, schema: { type: string } }
+        - { name: review_status, in: query, schema: { type: string } }
+      responses:
+        "200":
+          description: List of anchors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  anchors: { type: array, items: { $ref: "#/components/schemas/GeoAnchorWithLocation" } }
+    post:
+      operationId: createGeoAnchor
+      summary: Manually create or override a personal anchor
+      tags: [Globe]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/GeoAnchorCreateRequest" }
+      responses:
+        "201":
+          description: Anchor created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  anchor: { $ref: "#/components/schemas/GeoAnchorWithLocation" }
+
+  /globe/anchors/{anchorId}:
+    get:
+      operationId: getGeoAnchor
+      summary: Get anchor detail with concept and location info
+      tags: [Globe]
+      parameters:
+        - { name: anchorId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: Full anchor detail
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  anchor: { $ref: "#/components/schemas/GeoAnchorWithLocation" }
+                  concept_detail: { $ref: "#/components/schemas/Concept" }
+                  location_detail: { $ref: "#/components/schemas/Location" }
+
+  /globe/anchors/{anchorId}/review:
+    post:
+      operationId: reviewGeoAnchor
+      summary: Mark an anchor as reviewed
+      tags: [Globe]
+      parameters:
+        - { name: anchorId, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReviewRequest" }
+      responses:
+        "200":
+          description: Review recorded
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReviewResponse" }
+
+  # ─── JOURNEY & QUESTS ──────────────────────────────
+  /journey/routes:
+    get:
+      operationId: listJourneyRoutes
+      summary: Get DAG-optimized learning routes
+      tags: [Journey]
+      parameters:
+        - { name: subject, in: query, schema: { type: string } }
+        - { name: active_only, in: query, schema: { type: boolean } }
+      responses:
+        "200":
+          description: Available routes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  routes: { type: array, items: { $ref: "#/components/schemas/JourneyRoute" } }
+
+  /journey/routes/{routeId}:
+    get:
+      operationId: getJourneyRoute
+      summary: Get a specific journey route
+      tags: [Journey]
+      parameters:
+        - { name: routeId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: Route with stops
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/JourneyRoute" }
+
+  /quests/daily:
+    get:
+      operationId: getDailyQuests
+      summary: Get today's 3 quests
+      tags: [Quests]
+      responses:
+        "200":
+          description: Daily quests
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  date: { type: string, format: date }
+                  quests: { type: array, items: { $ref: "#/components/schemas/DailyQuest" } }
+                  journey_route: { $ref: "#/components/schemas/JourneyRoute" }
+
+  /quests/{questId}/complete:
+    post:
+      operationId: completeQuest
+      summary: Mark a quest as completed
+      tags: [Quests]
+      parameters:
+        - { name: questId, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                note_id: { type: string, format: uuid }
+              required: [note_id]
+      responses:
+        "200":
+          description: Quest completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  quest: { $ref: "#/components/schemas/DailyQuest" }
+                  xp_earned: { type: integer }
+                  evolution_index_delta: { type: number }
+
+  # ─── METACOGNITION ─────────────────────────────────
+  /metacog/dashboard:
+    get:
+      operationId: getMetacogDashboard
+      summary: Get metacognition dashboard data
+      tags: [Metacognition]
+      responses:
+        "200":
+          description: Dashboard data
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MetacogDashboard" }
+
+  /metacog/knowledge-map:
+    get:
+      operationId: getKnowledgeMap
+      summary: Get heatmap overlay data for globe
+      tags: [Metacognition]
+      parameters:
+        - { name: subject, in: query, schema: { type: string } }
+      responses:
+        "200":
+          description: Knowledge map regions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  regions: { type: array, items: { $ref: "#/components/schemas/KnowledgeMapRegion" } }
+
+  # ─── SCAFFOLDING ───────────────────────────────────
+  /scaffolding/trigger:
+    post:
+      operationId: triggerScaffolding
+      summary: Request scaffolding for a concept
+      tags: [Scaffolding]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ScaffoldingRequest" }
+      responses:
+        "200":
+          description: Scaffolding content
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ScaffoldingResponse" }

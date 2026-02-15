@@ -1,0 +1,149 @@
+{
+  "app": {
+    "name": "MemoGlobe",
+    "tagline": "Write notes on a globe. AI finds your blind spots.",
+    "description": "Geo-Metacognitive Self-Evolution Learning Platform"
+  },
+  "nav": {
+    "globe": "Globe",
+    "notes": "Notes",
+    "dashboard": "Dashboard",
+    "quests": "Quests",
+    "settings": "Settings",
+    "login": "Log In",
+    "register": "Sign Up",
+    "logout": "Log Out"
+  },
+  "globe": {
+    "title": "Knowledge Globe",
+    "pinStatus": {
+      "mastered": "Mastered",
+      "gap": "Knowledge Gap",
+      "review": "Needs Review",
+      "path": "Learning Path",
+      "personal": "Personal Anchor"
+    },
+    "heatmap": "Knowledge Heatmap",
+    "zoomIn": "Zoom In",
+    "zoomOut": "Zoom Out",
+    "resetView": "Reset View",
+    "locationDetail": {
+      "title": "Location Detail",
+      "streetView": "Street View",
+      "anchoredConcepts": "Anchored Concepts",
+      "reviewHistory": "Review History",
+      "strength": "Memory Strength",
+      "nextReview": "Next Review"
+    }
+  },
+  "notes": {
+    "title": "Notes",
+    "newNote": "New Note",
+    "templates": {
+      "cornell": "Cornell Notes",
+      "zettelkasten": "Zettelkasten",
+      "outline": "Outline",
+      "concept_map": "Concept Map"
+    },
+    "subject": "Subject",
+    "subjectPlaceholder": "Enter subject",
+    "save": "Save",
+    "analyzing": "AI is analyzing...",
+    "cornell": {
+      "cueColumn": "Questions / Keywords",
+      "mainNotes": "Main Notes",
+      "summary": "Summary"
+    },
+    "zettelkasten": {
+      "atomicNote": "Atomic Note",
+      "links": "Linked Notes",
+      "tags": "Tags",
+      "source": "Source"
+    }
+  },
+  "analysis": {
+    "title": "AI Analysis Report",
+    "srs": {
+      "label": "Redundancy (SRS)",
+      "warning": "This content is {{percent}}% similar to previous notes."
+    },
+    "kcs": {
+      "label": "Curriculum Coverage (KCS)",
+      "gapAlert": "{{count}} concepts have not been studied yet."
+    },
+    "bloom": {
+      "label": "Bloom Classification",
+      "levels": {
+        "remember": "Remember",
+        "understand": "Understand",
+        "apply": "Apply",
+        "analyze": "Analyze",
+        "evaluate": "Evaluate",
+        "create": "Create"
+      },
+      "imbalanceAlert": "Lower-order thinking (Remember+Understand) is at {{percent}}%. Try more higher-order thinking."
+    },
+    "cli": {
+      "label": "Cognitive Load (CLI)",
+      "overloadAlert": "Cognitive load is high! Take a break."
+    },
+    "dag": {
+      "label": "Prerequisites",
+      "violationAlert": "Consider studying {{concepts}} first."
+    }
+  },
+  "dashboard": {
+    "title": "Metacognition Dashboard",
+    "evolutionIndex": "Evolution Index",
+    "streak": "Learning Streak",
+    "streakDays": "{{count}} days",
+    "bloomDistribution": "Bloom Distribution",
+    "coverageBySubject": "Coverage by Subject",
+    "cliTrend": "Cognitive Load Trend",
+    "knowledgeMap": "Knowledge Map"
+  },
+  "quests": {
+    "title": "Today's Quests",
+    "types": {
+      "gap_review": "Gap Review",
+      "bloom_push": "Bloom Level Up",
+      "new_explore": "New Exploration"
+    },
+    "complete": "Complete",
+    "completed": "Completed",
+    "xpEarned": "+{{xp}} XP",
+    "journeyRoute": "Learning Journey Route"
+  },
+  "scaffolding": {
+    "hint": {
+      "title": "Hint",
+      "prompt": "Think about this question:"
+    },
+    "decompose": {
+      "title": "Decompose",
+      "prompt": "Let's break this concept into smaller parts:"
+    },
+    "simplify": {
+      "title": "Simplify",
+      "prompt": "Let's understand through an analogy:"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "noData": "No data available",
+    "days": "days",
+    "weeks": "weeks",
+    "months": "months"
+  }
+}

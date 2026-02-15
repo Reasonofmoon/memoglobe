@@ -1,0 +1,149 @@
+{
+  "app": {
+    "name": "MemoGlobe",
+    "tagline": "지구 위에 필기하라. AI가 빈칸을 찾는다.",
+    "description": "Geo-Metacognitive Self-Evolution Learning Platform"
+  },
+  "nav": {
+    "globe": "글로브",
+    "notes": "노트",
+    "dashboard": "대시보드",
+    "quests": "퀘스트",
+    "settings": "설정",
+    "login": "로그인",
+    "register": "회원가입",
+    "logout": "로그아웃"
+  },
+  "globe": {
+    "title": "지식 글로브",
+    "pinStatus": {
+      "mastered": "완전 습득",
+      "gap": "지식 공백",
+      "review": "복습 필요",
+      "path": "학습 경로",
+      "personal": "개인 앵커"
+    },
+    "heatmap": "지식 히트맵",
+    "zoomIn": "확대",
+    "zoomOut": "축소",
+    "resetView": "초기화",
+    "locationDetail": {
+      "title": "장소 상세",
+      "streetView": "스트리트 뷰",
+      "anchoredConcepts": "연결된 개념들",
+      "reviewHistory": "복습 이력",
+      "strength": "기억 강도",
+      "nextReview": "다음 복습일"
+    }
+  },
+  "notes": {
+    "title": "노트",
+    "newNote": "새 노트 작성",
+    "templates": {
+      "cornell": "코넬 노트",
+      "zettelkasten": "제텔카스텐",
+      "outline": "아웃라인",
+      "concept_map": "개념도"
+    },
+    "subject": "과목",
+    "subjectPlaceholder": "과목을 입력하세요",
+    "save": "저장",
+    "analyzing": "AI 분석 중...",
+    "cornell": {
+      "cueColumn": "질문/키워드",
+      "mainNotes": "핵심 노트",
+      "summary": "요약"
+    },
+    "zettelkasten": {
+      "atomicNote": "단일 아이디어",
+      "links": "연결 노트",
+      "tags": "태그",
+      "source": "출처"
+    }
+  },
+  "analysis": {
+    "title": "AI 분석 리포트",
+    "srs": {
+      "label": "중복도 (SRS)",
+      "warning": "이 내용은 이전 노트와 {{percent}}% 유사합니다."
+    },
+    "kcs": {
+      "label": "커리큘럼 커버리지 (KCS)",
+      "gapAlert": "{{count}}개 개념이 아직 학습되지 않았습니다."
+    },
+    "bloom": {
+      "label": "블룸 분류",
+      "levels": {
+        "remember": "기억",
+        "understand": "이해",
+        "apply": "적용",
+        "analyze": "분석",
+        "evaluate": "평가",
+        "create": "창조"
+      },
+      "imbalanceAlert": "저차원 사고(기억+이해)가 {{percent}}%입니다. 고차원 사고를 늘려보세요."
+    },
+    "cli": {
+      "label": "인지 부하 (CLI)",
+      "overloadAlert": "인지 부하가 높습니다! 잠시 쉬어가세요."
+    },
+    "dag": {
+      "label": "선수 학습",
+      "violationAlert": "{{concepts}}을(를) 먼저 학습하는 것이 좋습니다."
+    }
+  },
+  "dashboard": {
+    "title": "메타인지 대시보드",
+    "evolutionIndex": "성장 지수",
+    "streak": "연속 학습",
+    "streakDays": "{{count}}일",
+    "bloomDistribution": "블룸 분포",
+    "coverageBySubject": "과목별 커버리지",
+    "cliTrend": "인지 부하 추이",
+    "knowledgeMap": "지식 지도"
+  },
+  "quests": {
+    "title": "오늘의 퀘스트",
+    "types": {
+      "gap_review": "공백 복습",
+      "bloom_push": "사고 레벨 업",
+      "new_explore": "새로운 탐험"
+    },
+    "complete": "완료",
+    "completed": "완료됨",
+    "xpEarned": "+{{xp}} XP",
+    "journeyRoute": "학습 여정 경로"
+  },
+  "scaffolding": {
+    "hint": {
+      "title": "힌트",
+      "prompt": "이 질문에 대해 생각해보세요:"
+    },
+    "decompose": {
+      "title": "분해",
+      "prompt": "이 개념을 작은 단위로 나눠볼까요?"
+    },
+    "simplify": {
+      "title": "단순화",
+      "prompt": "비유로 이해해볼까요?"
+    }
+  },
+  "common": {
+    "loading": "로딩 중...",
+    "error": "오류가 발생했습니다",
+    "retry": "다시 시도",
+    "cancel": "취소",
+    "confirm": "확인",
+    "save": "저장",
+    "delete": "삭제",
+    "edit": "수정",
+    "back": "뒤로",
+    "next": "다음",
+    "previous": "이전",
+    "search": "검색",
+    "noData": "데이터가 없습니다",
+    "days": "일",
+    "weeks": "주",
+    "months": "개월"
+  }
+}
